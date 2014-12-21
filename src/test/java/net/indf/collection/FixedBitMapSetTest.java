@@ -62,11 +62,12 @@ public class FixedBitMapSetTest {
     public void addAllSetTest() {
         set.addAll(Arrays.asList(749, 64,31));
         assertThat(5, is(set.size()));
-        System.out.println(set.contains(749));
-//        assertTrue(set.contains(749));
-//        assertTrue(set.contains(64));
-//        assertTrue(set.contains(31));
-//        assertTrue(set.contains(7));
-//        assertTrue(set.contains(23));
+        for(Object o : set.toArray()) {
+            final int num = Integer.class.cast(o);
+            if (Arrays.asList(7,23,31,64,749).contains(num))
+                continue;
+            fail();
+        }
+
     }
 }
