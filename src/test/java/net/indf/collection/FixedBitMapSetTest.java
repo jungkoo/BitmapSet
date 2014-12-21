@@ -3,7 +3,9 @@ package net.indf.collection;
 import org.junit.*;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -140,5 +142,21 @@ public class FixedBitMapSetTest {
         assertThat(set.size(), is(1));
         assertThat(t.size(), is(3));
         assertTrue(set.contains(7));
+    }
+
+    @Test
+    public void iteratorTest() {
+        set.add(555);
+        set.add(333);
+        set.add(1000);
+        assertThat(set.size(), is(5));
+        Iterator<Integer> iter = set.iterator();
+
+        final List<Integer> m = new ArrayList<Integer>();
+        while(iter.hasNext()) {
+            m.add(iter.next());
+        }
+        assertEquals(m.size(), set.size());
+        assertTrue(m.containsAll(set));
     }
 }

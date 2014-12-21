@@ -93,6 +93,54 @@ public class FixedBitMapSet implements Set<Integer> {
 	
 	@Override
 	public Iterator<Integer> iterator() {
+//        int v = 0;
+//
+//        for(int i=0; i<bitmap.length; i++) {
+//            for(int j=1;j<=64; j++) {
+//                long bitMask = 1l << (64-j);
+//                if ((bitmap[i] & bitMask) != 0) {
+//                    v = j+(i*64);
+//                    break;
+//                }
+//            }
+//        }
+//        final int pv = v;
+//        final int pi = v / 64;
+//        final int pj = (v+1) % 64;
+//        return new Iterator<Integer>() {
+//            private int preValue = pv;
+//            private int arrIdx = pi;
+//            private int bitIdx = pj;
+//
+//            @Override
+//            public boolean hasNext() {
+//                return preValue>0;
+//            }
+//
+//            @Override
+//            public Integer next() {
+//                if (!hasNext()) {
+//                    throw new NullPointerException("next() item is empty.");
+//                }
+//                final int nextValue = preValue;
+//                preValue = 0;
+//                for(; arrIdx<bitmap.length; arrIdx++) {
+//                    for(;bitIdx<=64; bitIdx++) {
+//                        long bitMask = 1l << (64-bitIdx);
+//                        if ((bitmap[arrIdx] & bitMask) != 0) {
+//                            preValue = bitIdx+(arrIdx*64);
+//                            break;
+//                        }
+//                    }
+//                }
+//                return nextValue;
+//            }
+//
+//            @Override
+//            public void remove() {
+//                throw new RuntimeException();
+//            }
+//        };
 		return toList().iterator();
 	}
 
