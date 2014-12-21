@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -52,6 +53,7 @@ public class FixedBitMapSetTest {
     public void toArrayTest() {
         for(Object o: set.toArray()) {
             int num = Integer.class.cast(o);
+            System.out.println(num);
             if (7==num || 23==num)
                 continue;
             fail();
@@ -68,6 +70,23 @@ public class FixedBitMapSetTest {
                 continue;
             fail();
         }
+    }
+
+    @Test
+    public void containsTest() {
+        set.add(555); // 7 23 555
+        assertThat(set.size(), is(3));
+        assertTrue(set.contains(7));
+        assertTrue(set.contains(23));
+        assertTrue(set.contains(555));
+        set.addAll(Arrays.asList(749,64,31));
+        assertThat(set.size(), is(6));
+        assertTrue(set.contains(7));
+        assertTrue(set.contains(23));
+        assertTrue(set.contains(555));
+        assertTrue(set.contains(749));
+        assertTrue(set.contains(64));
+        assertTrue(set.contains(31));
 
     }
 }

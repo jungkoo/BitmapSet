@@ -76,7 +76,7 @@ public class FixedBitMapSet implements Set<Integer> {
             return true;
         }
         final int arr_idx = (item-1) / 64;
-        final int bit_offset = (item % 64) -1;
+        final int bit_offset = 64 - (item % 64);
         return (bitmap[arr_idx] & (1l << bit_offset))>0;
 	}
 
@@ -84,12 +84,11 @@ public class FixedBitMapSet implements Set<Integer> {
 		final List<Integer> list = new LinkedList<Integer>();
         unpack();
 		for(int i=0; i<bitmap.length; i++) {
-			long bitMask = 1;
-			for(int j=1; j<=64; j++) {				
+			for(int j=1; j<=64; j++) {
+                long bitMask = 1l << (64-j);
 				if ((bitmap[i] & bitMask) != 0) {
 					list.add(j+(i*64));
 				}
-				bitMask = bitMask << 1;
 			}			
 		}
         pack();
@@ -120,7 +119,7 @@ public class FixedBitMapSet implements Set<Integer> {
         }
 
         final int arr_idx = (item-1) / 64;
-        final int bit_offset = (item % 64) -1;
+        final int bit_offset = 64 - (item % 64);
         final long bit_value = bitmap[arr_idx] | (1l << bit_offset);
         if (bit_value != bitmap[arr_idx]) {
         	bitmap[arr_idx] = bit_value;
@@ -137,12 +136,13 @@ public class FixedBitMapSet implements Set<Integer> {
         unpack();
 
         final int arr_idx = (item-1) / 64;
-        final int bit_offset = (item % 64) -1;
-        final long bit_value = bitmap[arr_idx] & ~(1 << bit_offset);
+        final int bit_offset = 64 - (item % 64);
+        final long bit_value = bitmap[arr_idx] & ~(1l << bit_offset);
         if (bit_value != bitmap[arr_idx]) {
         	bitmap[arr_idx] = bit_value;
             count-=1;
         }
+        System.out.println(Long.toBinaryString(bitmap[arr_idx]));
         return true;
 	}
 
