@@ -4,6 +4,7 @@ import org.junit.*;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,6 +40,31 @@ public class FixedBitMapSetTest {
     }
 
     @Test
+    public void addAllSetTest() {
+        set.addAll(Arrays.asList(749, 64,31));
+        assertThat(5, is(set.size()));
+        for(Object o : set.toArray()) {
+            final int num = Integer.class.cast(o);
+            if (Arrays.asList(7,23,31,64,749).contains(num))
+                continue;
+            fail();
+        }
+    }
+
+    @Test
+    public void addAllFixedBitSetTest() {
+        FixedBitMapSet bm = new FixedBitMapSet(1000);
+        bm.add(23);
+        bm.add(24);
+        set.addAll(bm);
+        assertThat(set.size(), is(3));
+        assertTrue(set.contains(7));
+        assertTrue(set.contains(23));
+        assertTrue(set.contains(24));
+
+    }
+
+    @Test
     public void removeTest() {
         set.remove(7);
         set.remove(112);
@@ -50,27 +76,33 @@ public class FixedBitMapSetTest {
     }
 
     @Test
+    public void removeAllSetTest() {
+        // 7 23
+        set.removeAll(Arrays.asList(7, 44));
+        assertThat(set.size(), is(1));
+        assertTrue(set.contains(23));
+    }
+
+    @Test
+    public void removeAllFixedBitSetTest() {
+        FixedBitMapSet bm = new FixedBitMapSet(1000);
+        bm.add(23);
+        bm.add(878);
+        set.removeAll(bm);
+        assertThat(set.size(), is(1));
+        assertTrue(set.contains(7));
+    }
+
+    @Test
     public void toArrayTest() {
         for(Object o: set.toArray()) {
             int num = Integer.class.cast(o);
-            System.out.println(num);
             if (7==num || 23==num)
                 continue;
             fail();
         }
     }
 
-    @Test
-    public void addAllSetTest() {
-        set.addAll(Arrays.asList(749, 64,31));
-        assertThat(5, is(set.size()));
-        for(Object o : set.toArray()) {
-            final int num = Integer.class.cast(o);
-            if (Arrays.asList(7,23,31,64,749).contains(num))
-                continue;
-            fail();
-        }
-    }
 
     @Test
     public void containsTest() {
@@ -87,6 +119,26 @@ public class FixedBitMapSetTest {
         assertTrue(set.contains(749));
         assertTrue(set.contains(64));
         assertTrue(set.contains(31));
+    }
 
+    @Test
+    public void retainAllCollectionTest() {
+        final List<Integer> t = Arrays.asList(1, 7, 34);
+        set.retainAll(t);
+        assertThat(set.size(), is(1));
+        assertThat(t.size(), is(3));
+        assertTrue(set.contains(7));
+    }
+
+    @Test
+    public void retainAllBitMapTest() {
+        FixedBitMapSet t = new FixedBitMapSet(1000);
+        t.add(7);
+        t.add(3);
+        t.add(34);
+        set.retainAll(t);
+        assertThat(set.size(), is(1));
+        assertThat(t.size(), is(3));
+        assertTrue(set.contains(7));
     }
 }

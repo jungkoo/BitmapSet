@@ -1,10 +1,6 @@
 package net.indf.collection;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 
@@ -14,7 +10,6 @@ public class FixedBitMapSet implements Set<Integer> {
     final private int limitValue;
     private long[] bitmap;
 	private int count;
-
 
 	
 	public FixedBitMapSet(final int limitValue) {
@@ -142,7 +137,6 @@ public class FixedBitMapSet implements Set<Integer> {
         	bitmap[arr_idx] = bit_value;
             count-=1;
         }
-        System.out.println(Long.toBinaryString(bitmap[arr_idx]));
         return true;
 	}
 
@@ -185,39 +179,25 @@ public class FixedBitMapSet implements Set<Integer> {
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-        throw new RuntimeException("sorry.");
-//        if (c instanceof FixedBitMapSet) {
-//            final FixedBitMapSet items = FixedBitMapSet.class.cast(c);
-//            if (limitValue != items.limitValue) {
-//                throw new IllegalArgumentException("bitSize is not equals. (src="+limitValue+", target="+items.limitValue+")");
-//            }
-//
-//            return true;
-//        }
-//
-//
-//		final FixedBitMapSet items;
-//		if (!(c instanceof FixedBitMapSet)) {
-//			items = new FixedBitMapSet(this.limitValue);
-//			Iterator<Integer> iterator = (Iterator<Integer>) c.iterator();
-//			while(iterator.hasNext()) {
-//				items.add(iterator.next());
-//			}
-//		}else{
-//			items = (FixedBitMapSet)c;
-//		}
-//
-//		if (limitValue != items.limitValue) {
-//            throw new IllegalArgumentException("bitSize is not equals. (src="+limitValue+", target="+items.limitValue+")");
-//        }
-//		int cnt = 0;
-//		for(int i=0; i< size(); i++) {
-//			bitmap[i] = bitmap[i] & items.bitmap[i];
-//			cnt += Long.bitCount(bitmap[i]);
-//		}
-//		this.count = cnt;
-//		return true;
-
+        objectCheck(c);
+        final FixedBitMapSet target;
+        if (c instanceof FixedBitMapSet) {
+            target = FixedBitMapSet.class.cast(c);
+        }else{
+            target = new FixedBitMapSet(this.limitValue);
+            for(final Object num : c) {
+                target.add((Integer)num);
+            }
+        }
+        unpack();
+        int cnt = 0;
+        for(int i=0; i<bitmap.length; i++) {
+            bitmap[i] = bitmap[i] & target.bitmap[i];
+            cnt += Long.bitCount(bitmap[i]);
+        }
+        this.count = cnt;
+        pack();
+        return true;
 	}
 
 	@Override
