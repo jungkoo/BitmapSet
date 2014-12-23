@@ -3,15 +3,33 @@ package net.indf.collection;
 import java.util.*;
 
 /**
- * 
- * @author : deajang@gmail.com
+ * 고정크기의 bitmask를 이용한 Set
+ *
+ * @author : deajang@gmail.com , 정민철
  */
 public class FixedBitMapSet implements Set<Integer> {
+
+	/**
+	 * 최대값을 의미한다, bit의 갯수와 동일한 의미를 가진다.
+	 */
     final private int limitValue;
+
+	/**
+	 * bit연산으로 표현된 데이터가 저장되는 값이다.
+	 */
     private long[] bitmap;
+
+	/**
+	 * size() 를 위한 매번 카운팅하지 않고 변수값을 활용하는 구조로 사용한다.
+	 */
 	private int count;
 
-	
+
+	/**
+	 * 고정크기의 bitmap을 생성한다.
+	 * limitvalue는 최대값을 의미하기도 하고, bit의 갯수를 의미하기도한다.
+	 * @param limitValue 사용할 최대값을 의미한다 (default : 65536)
+	 */
 	public FixedBitMapSet(final int limitValue) {
 		this.limitValue = limitValue;
         clear();
@@ -26,28 +44,45 @@ public class FixedBitMapSet implements Set<Integer> {
 		return count;
 	}
 
+	/**
+	 * 데이터가 꽉채워졌을때, 데이터절약을 위해 bitmap변수를 null로 비웠는지를 의미한다.
+	 * @return
+	 */
     private boolean isPack() {
         return bitmap==null;
     }
 
-
+	/**
+	 * 데이터가 꽉찼을때 null로 채워 공간을 절약하는 기능을 담당한다.
+	 */
     private void pack() {
         if(count>=limitValue)
             bitmap = null;
     }
 
+	/**
+	 * pack()된 데이터를 복구한다
+	 * 다시말해, bitmap=null 로 된 데이터를 다시 배열데이터로 변경해준다.
+	 */
     private void unpack() {
         if(isPack())
             full();
     }
 
-
+	/**
+	 * 허용된 값인지 체크한다. litmitValue범위 한도에 있는지를 체크한다.
+	 * @param item
+	 */
     private void valueCheck(int item) {
         if (item<=0 || item>limitValue) {
             throw new RuntimeException("value range is error. (1 ~ "+limitValue+", but "+item+")");
         }
     }
 
+	/**
+	 * 데이터형을 체크한다.
+	 * @param o
+	 */
     private void objectCheck(Object o) {
         if (o instanceof FixedBitMapSet) {
             final int targetLimitValue = FixedBitMapSet.class.cast(o).limitValue;
@@ -56,13 +91,21 @@ public class FixedBitMapSet implements Set<Integer> {
         }
     }
 
-
+	/**
+	 * 비어있는지 유무를 의미한다.
+	 * @return
+	 */
 	@Override
 	public boolean isEmpty() {		
 		return count<=0;
 	}
 
 
+	/**
+	 * 해당값이 이미 존재하는지 체크한다
+	 * @param o
+	 * @return
+	 */
 	@Override
 	public boolean contains(Object o) {
         final int item = (Integer)o;
@@ -93,54 +136,6 @@ public class FixedBitMapSet implements Set<Integer> {
 	
 	@Override
 	public Iterator<Integer> iterator() {
-//        int v = 0;
-//
-//        for(int i=0; i<bitmap.length; i++) {
-//            for(int j=1;j<=64; j++) {
-//                long bitMask = 1l << (64-j);
-//                if ((bitmap[i] & bitMask) != 0) {
-//                    v = j+(i*64);
-//                    break;
-//                }
-//            }
-//        }
-//        final int pv = v;
-//        final int pi = v / 64;
-//        final int pj = (v+1) % 64;
-//        return new Iterator<Integer>() {
-//            private int preValue = pv;
-//            private int arrIdx = pi;
-//            private int bitIdx = pj;
-//
-//            @Override
-//            public boolean hasNext() {
-//                return preValue>0;
-//            }
-//
-//            @Override
-//            public Integer next() {
-//                if (!hasNext()) {
-//                    throw new NullPointerException("next() item is empty.");
-//                }
-//                final int nextValue = preValue;
-//                preValue = 0;
-//                for(; arrIdx<bitmap.length; arrIdx++) {
-//                    for(;bitIdx<=64; bitIdx++) {
-//                        long bitMask = 1l << (64-bitIdx);
-//                        if ((bitmap[arrIdx] & bitMask) != 0) {
-//                            preValue = bitIdx+(arrIdx*64);
-//                            break;
-//                        }
-//                    }
-//                }
-//                return nextValue;
-//            }
-//
-//            @Override
-//            public void remove() {
-//                throw new RuntimeException();
-//            }
-//        };
 		return toList().iterator();
 	}
 
