@@ -144,16 +144,18 @@ public class BitMapSet implements Set<Integer> {
         final Iterator<Map.Entry<Integer, FixedBitMapSet>> mainIterator = fixedBitMapSetMap.entrySet().iterator();
         Iterator<Integer> currentIterator = null;
         int currentIndex = -1;
-        Integer current = null;
+        Integer current = updateCurrentValue();
 
         @Override
         public boolean hasNext() {
-            return false;
+            return current!=null;
         }
 
         @Override
         public Integer next() {
-            return null;
+            final Integer r = current;
+            updateCurrentValue();
+            return r;
         }
 
         public FixedBitMapSet pop() {
@@ -161,13 +163,23 @@ public class BitMapSet implements Set<Integer> {
             return fixedBitMapSetMap.get("");
         }
 
-        private void change() {
-            if(mainIterator.hasNext()) {
+        private Integer updateCurrentValue() {
+            if (currentIterator.hasNext()) {
+                current = currentIterator.next();
+                current = currentIndex * maxBitSize + current;
+                return current;
+            }
+
+            //currentIterator is empty
+            if (mainIterator.hasNext()) {
                 final Map.Entry<Integer, FixedBitMapSet> t = mainIterator.next();
                 currentIndex = t.getKey();
                 currentIterator = t.getValue().iterator();
+                updateCurrentValue();
             }
 
+            current = null;
+            return null;
         }
     }
 //
