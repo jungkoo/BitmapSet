@@ -5,24 +5,24 @@ import java.util.*;
 /**
  * Created by nhn on 2014-12-23.
  */
-public class BitMapSet implements Set<Integer> {
-    final Map<Integer, Set<Integer>> fixedBitMapSetMap = new TreeMap<Integer, Set<Integer>>();
+public class BitNet implements Set<Integer> {
+    final Map<Integer, Set<Integer>> blockDict = new TreeMap<Integer, Set<Integer>>();
     final int maxBitSize;
 
-    public BitMapSet(final int maxBitSize) {
+    public BitNet(final int maxBitSize) {
         this.maxBitSize = maxBitSize;
     }
 
-    public BitMapSet() {
+    public BitNet() {
         this(65536);
     }
 
     @Override
     public int size() {
-        if (fixedBitMapSetMap.isEmpty())
+        if (blockDict.isEmpty())
             return 0;
         int count = 0;
-        for(Set<Integer> s : fixedBitMapSetMap.values()) {
+        for(Set<Integer> s : blockDict.values()) {
             count += s.size();
         }
         return count;
@@ -30,9 +30,9 @@ public class BitMapSet implements Set<Integer> {
 
     @Override
     public boolean isEmpty() {
-        if (fixedBitMapSetMap.isEmpty())
+        if (blockDict.isEmpty())
             return true;
-        for(Set<Integer> s : fixedBitMapSetMap.values()) {
+        for(Set<Integer> s : blockDict.values()) {
             if(!isEmpty())
                 return false;
         }
@@ -41,7 +41,7 @@ public class BitMapSet implements Set<Integer> {
 
     @Override
     public boolean contains(Object o) {
-        if (!fixedBitMapSetMap.containsKey(toIndex(o)))
+        if (!blockDict.containsKey(toIndex(o)))
             return false;
         return get(o).contains(toValue((Integer) o));
     }
@@ -77,7 +77,7 @@ public class BitMapSet implements Set<Integer> {
 
     @Override
     public boolean remove(Object item) {
-        if (!fixedBitMapSetMap.containsKey(toIndex(item)))
+        if (!blockDict.containsKey(toIndex(item)))
             return false;
         return get(item).remove(toValue((Integer)item));
     }
@@ -122,10 +122,10 @@ public class BitMapSet implements Set<Integer> {
 
     private Set<Integer> get(Object o) {
         final int index = toIndex(o);
-        if (!fixedBitMapSetMap.containsKey(index)) {
-            fixedBitMapSetMap.put(index, new FixedBitMapSet(maxBitSize));
+        if (!blockDict.containsKey(index)) {
+            blockDict.put(index, new FixedBitSet(maxBitSize));
         }
-        return fixedBitMapSetMap.get(index);
+        return blockDict.get(index);
     }
     private int toIndex(Object o) {
         if (!(o instanceof Integer))
@@ -141,18 +141,12 @@ public class BitMapSet implements Set<Integer> {
 
     @Override
     public void clear() {
-        fixedBitMapSetMap.clear();
+        blockDict.clear();
     }
 
-//    protected void printDebug() {
-//        for(Map.Entry<Integer,Set<Integer>> e : fixedBitMapSetMap.entrySet()) {
-//            System.out.println(">> index: " + e.getKey());
-//            e.getValue().printDebug();
-//        }
-//    }
 
     private class itr implements Iterator<Integer> {
-        final Iterator<Map.Entry<Integer, Set<Integer>>> mainIterator = fixedBitMapSetMap.entrySet().iterator();
+        final Iterator<Map.Entry<Integer, Set<Integer>>> mainIterator = blockDict.entrySet().iterator();
         Iterator<Integer> currentIterator = null;
         int currentIndex = -1;
         Integer current = updateCurrentValue();
@@ -167,6 +161,13 @@ public class BitMapSet implements Set<Integer> {
             final Integer r = currentIndex * maxBitSize + current;
             updateCurrentValue();
             return r;
+        }
+
+        @Override
+        public void remove() {
+            final Integer r = next();
+            if (blockDict.containsKey(toIndex(r)))
+                get(r).remove(toValue(r));
         }
 
         private Integer updateCurrentValue() {

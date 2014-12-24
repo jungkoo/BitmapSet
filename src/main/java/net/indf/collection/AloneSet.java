@@ -28,7 +28,26 @@ public class AloneSet implements Set<Integer>  {
 
     @Override
     public Iterator<Integer> iterator() {
-        return null;
+        return new Iterator<Integer>() {
+            private Integer current = value;
+
+            @Override
+            public boolean hasNext() {
+                return current!=null;
+            }
+
+            @Override
+            public Integer next() {
+                final Integer t = current;
+                current = null;
+                return t;
+            }
+
+            @Override
+            public void remove() {
+                value = null;
+            }
+        };
     }
 
     @Override

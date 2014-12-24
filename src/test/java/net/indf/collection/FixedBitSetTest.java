@@ -3,7 +3,6 @@ package net.indf.collection;
 import org.junit.*;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -18,12 +17,12 @@ import static org.junit.Assert.fail;
  *
  * Created by tost on 2014-12-17.
  */
-public class FixedBitMapSetTest {
-    private FixedBitMapSet set;
+public class FixedBitSetTest {
+    private FixedBitSet set;
 
     @Before
     public void setup() {
-        set = new FixedBitMapSet(1000);
+        set = new FixedBitSet(1000);
         set.add(7);
         set.add(23);
     }
@@ -59,7 +58,7 @@ public class FixedBitMapSetTest {
 
     @Test
     public void addAllFixedBitSetTest() {
-        FixedBitMapSet bm = new FixedBitMapSet(1000);
+        FixedBitSet bm = new FixedBitSet(1000);
         bm.add(23);
         bm.add(24);
         set.addAll(bm);
@@ -91,7 +90,7 @@ public class FixedBitMapSetTest {
 
     @Test
     public void removeAllFixedBitSetTest() {
-        FixedBitMapSet bm = new FixedBitMapSet(1000);
+        FixedBitSet bm = new FixedBitSet(1000);
         bm.add(23);
         bm.add(878);
         set.removeAll(bm);
@@ -138,7 +137,7 @@ public class FixedBitMapSetTest {
 
     @Test
     public void retainAllBitMapTest() {
-        FixedBitMapSet t = new FixedBitMapSet(1000);
+        FixedBitSet t = new FixedBitSet(1000);
         t.add(7);
         t.add(3);
         t.add(34);

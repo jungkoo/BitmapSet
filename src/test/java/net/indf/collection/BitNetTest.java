@@ -6,7 +6,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -15,13 +14,13 @@ import static org.junit.Assert.*;
 /**
  * Created by nhn on 2014-12-24.
  */
-public class BitMapSetTest {
-    private BitMapSet set;
+public class BitNetTest {
+    private BitNet set;
     private List<Integer> list = Arrays.asList(7,23,8282072);
 
     @Before
     public void setup() {
-        set = new BitMapSet(10);
+        set = new BitNet(10);
         for(Integer i : list) {
             set.add(i);
         }

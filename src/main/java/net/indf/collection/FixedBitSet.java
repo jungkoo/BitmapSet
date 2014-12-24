@@ -7,7 +7,7 @@ import java.util.*;
  *
  * @author : deajang@gmail.com , 정민철
  */
-public class FixedBitMapSet implements Set<Integer> {
+public class FixedBitSet implements Set<Integer> {
 
 	/**
 	 * 최대값을 의미한다, bit의 갯수와 동일한 의미를 가진다.
@@ -30,12 +30,12 @@ public class FixedBitMapSet implements Set<Integer> {
 	 * limitvalue는 최대값을 의미하기도 하고, bit의 갯수를 의미하기도한다.
 	 * @param limitValue 사용할 최대값을 의미한다 (default : 65536)
 	 */
-	public FixedBitMapSet(final int limitValue) {
+	public FixedBitSet(final int limitValue) {
 		this.limitValue = limitValue;
         clear();
 	}
 	
-	public FixedBitMapSet() {
+	public FixedBitSet() {
 		this(65536);
 	}
 	
@@ -84,8 +84,8 @@ public class FixedBitMapSet implements Set<Integer> {
 	 * @param o
 	 */
     private void objectCheck(Object o) {
-        if (o instanceof FixedBitMapSet) {
-            final int targetLimitValue = FixedBitMapSet.class.cast(o).limitValue;
+        if (o instanceof FixedBitSet) {
+            final int targetLimitValue = FixedBitSet.class.cast(o).limitValue;
             if (limitValue != targetLimitValue)
                 throw new RuntimeException("limit error (original="+limitValue+", target="+targetLimitValue+")");
         }
@@ -196,14 +196,14 @@ public class FixedBitMapSet implements Set<Integer> {
 	@Override
 	public boolean addAll(Collection<? extends Integer> c) {
         objectCheck(c);
-        if (!(c instanceof FixedBitMapSet)) {
+        if (!(c instanceof FixedBitSet)) {
             for(Object o: c)
                 add((Integer)o);
             return true;
         }
 
         if (isPack()) return true;
-        final FixedBitMapSet items = (FixedBitMapSet)c;
+        final FixedBitSet items = (FixedBitSet)c;
         if (items.isPack()) { // 다 엎어씌울때
             fullAndPack();
             return true;
@@ -224,11 +224,11 @@ public class FixedBitMapSet implements Set<Integer> {
 	@Override
 	public boolean retainAll(Collection<?> c) {
         objectCheck(c);
-        final FixedBitMapSet target;
-        if (c instanceof FixedBitMapSet) {
-            target = FixedBitMapSet.class.cast(c);
+        final FixedBitSet target;
+        if (c instanceof FixedBitSet) {
+            target = FixedBitSet.class.cast(c);
         }else{
-            target = new FixedBitMapSet(this.limitValue);
+            target = new FixedBitSet(this.limitValue);
             for(final Object num : c) {
                 target.add((Integer)num);
             }
@@ -247,14 +247,14 @@ public class FixedBitMapSet implements Set<Integer> {
 	@Override
 	public boolean removeAll(Collection<?> c) {
         objectCheck(c);
-        if (!(c instanceof FixedBitMapSet)) {
+        if (!(c instanceof FixedBitSet)) {
             for(Object o: c) {
                 remove(o);
             }
             return true;
         }
 
-        final FixedBitMapSet items = (FixedBitMapSet)c;
+        final FixedBitSet items = (FixedBitSet)c;
         if(isEmpty())
             return true;
         if(items.isEmpty())
