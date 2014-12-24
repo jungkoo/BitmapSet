@@ -5,15 +5,15 @@ import java.util.*;
 /**
  * Created by nhn on 2014-12-23.
  */
-public class BitNet implements Set<Integer> {
+public class HyperSet implements Set<Integer> {
     final Map<Integer, Set<Integer>> blockDict = new TreeMap<Integer, Set<Integer>>();
     final int maxBitSize;
 
-    public BitNet(final int maxBitSize) {
+    public HyperSet(final int maxBitSize) {
         this.maxBitSize = maxBitSize;
     }
 
-    public BitNet() {
+    public HyperSet() {
         this(65536);
     }
 
@@ -72,14 +72,27 @@ public class BitNet implements Set<Integer> {
 
     @Override
     public boolean add(Integer item) {
-        return get(item).add(toValue(item));
+        Set<Integer> temp = get(item);
+        if(temp instanceof AloneSet && !temp.isEmpty()) {     //is not empty
+            final Integer value = ((AloneSet) temp).get();
+            set(item, new FixedBitSet(maxBitSize));
+            temp = get(item);
+            temp.add(toValue(value));
+        }
+        final boolean r = temp.add(toValue(item));
+        return r;
     }
 
     @Override
     public boolean remove(Object item) {
         if (!blockDict.containsKey(toIndex(item)))
             return false;
-        return get(item).remove(toValue((Integer)item));
+        final Set<Integer> temp = get(item);
+        final boolean ret = temp.remove(toValue((Integer)item));
+        if(temp.isEmpty()) {
+            blockDict.remove(toIndex(item));
+        }
+        return ret;
     }
 
     @Override
@@ -123,10 +136,16 @@ public class BitNet implements Set<Integer> {
     private Set<Integer> get(Object o) {
         final int index = toIndex(o);
         if (!blockDict.containsKey(index)) {
-            blockDict.put(index, new FixedBitSet(maxBitSize));
+            set(o, new AloneSet()); // 최초는 이렇다.
         }
         return blockDict.get(index);
     }
+
+    private void set(Object o, Set<Integer> set) {
+        final int index = toIndex(o);
+        blockDict.put(index, set);
+    }
+
     private int toIndex(Object o) {
         if (!(o instanceof Integer))
             throw new IllegalArgumentException("No Integer type.");

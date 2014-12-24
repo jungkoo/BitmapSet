@@ -10,6 +10,10 @@ import java.util.*;
  */
 public class AloneSet implements Set<Integer>  {
     private Integer value;
+
+    public Integer get() {
+        return value;
+    }
     
     @Override
     public int size() {
@@ -70,8 +74,10 @@ public class AloneSet implements Set<Integer>  {
 
     @Override
     public boolean add(Integer integer) {
-        if (isEmpty())
+        if (isEmpty()) {
             value = integer;
+            return true;
+        }
         throw new IllegalArgumentException();
     }
 

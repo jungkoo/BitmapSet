@@ -14,13 +14,13 @@ import static org.junit.Assert.*;
 /**
  * Created by nhn on 2014-12-24.
  */
-public class BitNetTest {
-    private BitNet set;
+public class HyperSetTest {
+    private HyperSet set;
     private List<Integer> list = Arrays.asList(7,23,8282072);
 
     @Before
     public void setup() {
-        set = new BitNet(10);
+        set = new HyperSet(10);
         for(Integer i : list) {
             set.add(i);
         }
