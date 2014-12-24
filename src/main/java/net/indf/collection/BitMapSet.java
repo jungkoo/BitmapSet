@@ -6,7 +6,7 @@ import java.util.*;
  * Created by nhn on 2014-12-23.
  */
 public class BitMapSet implements Set<Integer> {
-    final Map<Integer, FixedBitMapSet> fixedBitMapSetMap = new TreeMap<Integer, FixedBitMapSet>();
+    final Map<Integer, Set<Integer>> fixedBitMapSetMap = new TreeMap<Integer, Set<Integer>>();
     final int maxBitSize;
 
     public BitMapSet(final int maxBitSize) {
@@ -22,7 +22,7 @@ public class BitMapSet implements Set<Integer> {
         if (fixedBitMapSetMap.isEmpty())
             return 0;
         int count = 0;
-        for(FixedBitMapSet s : fixedBitMapSetMap.values()) {
+        for(Set<Integer> s : fixedBitMapSetMap.values()) {
             count += s.size();
         }
         return count;
@@ -32,7 +32,7 @@ public class BitMapSet implements Set<Integer> {
     public boolean isEmpty() {
         if (fixedBitMapSetMap.isEmpty())
             return true;
-        for(FixedBitMapSet s : fixedBitMapSetMap.values()) {
+        for(Set<Integer> s : fixedBitMapSetMap.values()) {
             if(!isEmpty())
                 return false;
         }
@@ -120,7 +120,7 @@ public class BitMapSet implements Set<Integer> {
         return true;
     }
 
-    private FixedBitMapSet get(Object o) {
+    private Set<Integer> get(Object o) {
         final int index = toIndex(o);
         if (!fixedBitMapSetMap.containsKey(index)) {
             fixedBitMapSetMap.put(index, new FixedBitMapSet(maxBitSize));
@@ -144,15 +144,15 @@ public class BitMapSet implements Set<Integer> {
         fixedBitMapSetMap.clear();
     }
 
-    protected void printDebug() {
-        for(Map.Entry<Integer,FixedBitMapSet> e : fixedBitMapSetMap.entrySet()) {
-            System.out.println(">> index: " + e.getKey());
-            e.getValue().printDebug();
-        }
-    }
+//    protected void printDebug() {
+//        for(Map.Entry<Integer,Set<Integer>> e : fixedBitMapSetMap.entrySet()) {
+//            System.out.println(">> index: " + e.getKey());
+//            e.getValue().printDebug();
+//        }
+//    }
 
     private class itr implements Iterator<Integer> {
-        final Iterator<Map.Entry<Integer, FixedBitMapSet>> mainIterator = fixedBitMapSetMap.entrySet().iterator();
+        final Iterator<Map.Entry<Integer, Set<Integer>>> mainIterator = fixedBitMapSetMap.entrySet().iterator();
         Iterator<Integer> currentIterator = null;
         int currentIndex = -1;
         Integer current = updateCurrentValue();
@@ -172,7 +172,7 @@ public class BitMapSet implements Set<Integer> {
         private Integer updateCurrentValue() {
             //currentIterator is empty
             if ((currentIterator==null||!currentIterator.hasNext()) && mainIterator.hasNext()) {
-                final Map.Entry<Integer, FixedBitMapSet> t = mainIterator.next();
+                final Map.Entry<Integer, Set<Integer>> t = mainIterator.next();
                 currentIndex = t.getKey();
                 currentIterator = t.getValue().iterator();
             }
