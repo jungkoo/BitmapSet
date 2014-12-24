@@ -27,9 +27,6 @@ public class FixedBitSetTest {
         set.add(23);
     }
 
-    public void bitTest() {
-        set.printDebug();
-    }
 
     @Test
     public void countTest() {
@@ -160,5 +157,18 @@ public class FixedBitSetTest {
             fail();
         }
         assertThat(count, is(2));
+    }
+
+    @Test
+    public void iteratorRemoveTest() {
+        assertThat(set.size(), is(2));
+        final Iterator<Integer> it = set.iterator();
+        while(it.hasNext()) {
+            if (23==it.next()) {
+                it.remove();
+            }
+        }
+        assertThat(set.size(), is(1));
+        assertTrue(set.contains(7));
     }
 }

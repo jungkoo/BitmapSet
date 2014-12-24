@@ -118,35 +118,30 @@ public class FixedBitSet implements Set<Integer> {
         return (bitmap[arr_idx] & (1l << bit_offset))>0;
 	}
 
-	private List<Integer> toList() {
-		final List<Integer> list = new LinkedList<Integer>();
-        unpack();
-		for(int i=0; i<bitmap.length; i++) {
-			for(int j=1; j<=64; j++) {
-                long bitMask = 1l << (64-j);
-				if ((bitmap[i] & bitMask) != 0) {
-					list.add(j+(i*64));
-				}
-			}			
-		}
-        pack();
-		return list;
-	}
-	
-	
+
 	@Override
 	public Iterator<Integer> iterator() {
-		return toList().iterator();
+		return new itr();
 	}
 
 	@Override
 	public Object[] toArray() {
-		return toList().toArray();
+        final Iterator<Integer> it = iterator();
+        final List<Integer> list = new LinkedList<Integer>();
+        while(it.hasNext()) {
+            list.add(it.next());
+        }
+		return list.toArray();
 	}
 
 	@Override
 	public <T> T[] toArray(T[] a) {
-		return toList().toArray(a);
+        final Iterator<Integer> it = iterator();
+        final List<Integer> list = new LinkedList<Integer>();
+        while(it.hasNext()) {
+            list.add(it.next());
+        }
+        return list.toArray(a);
 	}
 
 	@Override
@@ -309,4 +304,67 @@ public class FixedBitSet implements Set<Integer> {
 		}
 		pack();
 	}
+
+    private class itr implements Iterator<Integer> {
+        int currentArrIndex = 0;
+        int currentBitSeq   = 1; // 1 ~ 64
+        Integer current = updateCurrentValue();
+        int nextItem;
+        boolean isOver;
+
+        @Override
+        public boolean hasNext() {
+            return current!=null;
+        }
+
+        @Override
+        public Integer next() {
+            nextItem = current;
+            updateCurrentValue();
+            return nextItem;
+        }
+
+        @Override
+        public void remove() {
+            FixedBitSet.this.remove(nextItem);
+        }
+
+        private Integer updateCurrentValue() {
+            if (!FixedBitSet.this.isPack()) {
+                if(currentBitSeq>64) {
+                    currentBitSeq = 1;
+                    currentArrIndex += 1;
+                }
+                if(currentArrIndex<bitmap.length) {
+                    long bitMask = 1l << (64-currentBitSeq);
+                    if ((bitmap[currentArrIndex] & bitMask) != 0) {
+                        current = currentBitSeq + (currentArrIndex*64);
+                        currentBitSeq += 1;
+                        return current;
+                    }else{
+                        currentBitSeq += 1;
+                        return updateCurrentValue();
+                    }
+                }
+            }
+
+            if (FixedBitSet.this.isPack() && isOver==false) {
+                if (current==null)  {
+                    current = 1;
+                    return current;
+                }
+                if (current+1==limitValue)
+                    isOver = true;
+
+                if (current+1<=limitValue){
+                    current += 1;
+                    return current;
+
+                }
+            }
+            isOver = true;
+            current = null;
+            return null;
+        }
+    }
 }

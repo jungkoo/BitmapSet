@@ -3,7 +3,9 @@ package net.indf.collection;
 import java.util.*;
 
 /**
- * Created by nhn on 2014-12-23.
+ * 숫자형 데이터의 Set의 메모리 효율적인 구현처리
+ *
+ * Created by 정민철 on 2014-12-23.
  */
 public class HyperSet implements Set<Integer> {
     final Map<Integer, Set<Integer>> blockDict = new TreeMap<Integer, Set<Integer>>();
@@ -169,6 +171,7 @@ public class HyperSet implements Set<Integer> {
         Iterator<Integer> currentIterator = null;
         int currentIndex = -1;
         Integer current = updateCurrentValue();
+        int nextItem;
 
         @Override
         public boolean hasNext() {
@@ -177,16 +180,15 @@ public class HyperSet implements Set<Integer> {
 
         @Override
         public Integer next() {
-            final Integer r = currentIndex * maxBitSize + current;
+            nextItem  = currentIndex * maxBitSize + current;
             updateCurrentValue();
-            return r;
+            return nextItem;
         }
 
         @Override
         public void remove() {
-            final Integer r = next();
-            if (blockDict.containsKey(toIndex(r)))
-                get(r).remove(toValue(r));
+            if (blockDict.containsKey(toIndex(nextItem)))
+                get(nextItem).remove(toValue(nextItem));
         }
 
         private Integer updateCurrentValue() {
