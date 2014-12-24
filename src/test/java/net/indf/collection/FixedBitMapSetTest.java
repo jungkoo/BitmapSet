@@ -146,17 +146,16 @@ public class FixedBitMapSetTest {
 
     @Test
     public void iteratorTest() {
-        set.add(555);
-        set.add(333);
-        set.add(1000);
-        assertThat(set.size(), is(5));
-        Iterator<Integer> iter = set.iterator();
-
-        final List<Integer> m = new ArrayList<Integer>();
-        while(iter.hasNext()) {
-            m.add(iter.next());
+        assertThat(set.size(), is(2));
+        final Iterator<Integer> it = set.iterator();
+        int count = 0;
+        while(it.hasNext()) {
+            if (Arrays.asList(7,23).contains(it.next())) {
+                count += 1;
+                continue;
+            }
+            fail();
         }
-        assertEquals(m.size(), set.size());
-        assertTrue(m.containsAll(set));
+        assertThat(count, is(2));
     }
 }

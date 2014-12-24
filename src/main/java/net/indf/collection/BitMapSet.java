@@ -72,7 +72,7 @@ public class BitMapSet implements Set<Integer> {
 
     @Override
     public boolean add(Integer item) {
-        return get(item).add(item);
+        return get(toIndex(item)).add(toValue(item));
     }
 
     @Override
@@ -134,6 +134,10 @@ public class BitMapSet implements Set<Integer> {
         return (value-1) / maxBitSize;
     }
 
+    private int toValue(int value) {
+        return value % maxBitSize;
+    }
+
     @Override
     public void clear() {
         fixedBitMapSetMap.clear();
@@ -154,61 +158,25 @@ public class BitMapSet implements Set<Integer> {
         @Override
         public Integer next() {
             final Integer r = current;
+//            current = currentIndex * maxBitSize + current;
             updateCurrentValue();
             return r;
         }
 
-        public FixedBitMapSet pop() {
-
-            return fixedBitMapSetMap.get("");
-        }
-
         private Integer updateCurrentValue() {
-            if (currentIterator.hasNext()) {
-                current = currentIterator.next();
-                current = currentIndex * maxBitSize + current;
-                return current;
-            }
-
             //currentIterator is empty
-            if (mainIterator.hasNext()) {
+            if ((currentIterator==null||!currentIterator.hasNext()) && mainIterator.hasNext()) {
                 final Map.Entry<Integer, FixedBitMapSet> t = mainIterator.next();
                 currentIndex = t.getKey();
                 currentIterator = t.getValue().iterator();
-                updateCurrentValue();
             }
 
+            if (currentIterator!=null && currentIterator.hasNext()) {
+                current = currentIterator.next();
+                return current;
+            }
             current = null;
             return null;
         }
     }
-//
-//    return new Iterator<Integer>() {
-//        final Iterator<Map.Entry<Integer,FixedBitMapSet>> it = fixedBitMapSetMap.entrySet().iterator();
-//        final Map.Entry<Integer,FixedBitMapSet> first = it.hasNext() ? it.next() : null;
-//        Integer offsetIdx = first !=null? first.getKey():-1;
-//        Iterator<Integer> current = first !=null? first.getValue().iterator():null;
-//
-//        @Override
-//        public boolean hasNext() {
-//            new ArrayList().iterator()
-//            return (current!=null && current.hasNext());
-//        }
-//
-//        @Override
-//        public Integer next() {
-//            Integer retValue = null;
-//            if (bitmapValue<=maxBitSize) {
-//
-//            }
-//            return retValue;
-//        }
-//
-//        @Override
-//        public void remove() {
-//
-//        }
-//
-//    };
-
 }
