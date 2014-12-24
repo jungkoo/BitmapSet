@@ -43,7 +43,7 @@ public class BitMapSet implements Set<Integer> {
     public boolean contains(Object o) {
         if (!fixedBitMapSetMap.containsKey(toIndex(o)))
             return false;
-        return get(o).contains(o);
+        return get(o).contains(toValue((Integer) o));
     }
 
     public List<Integer> toList() {
@@ -72,14 +72,14 @@ public class BitMapSet implements Set<Integer> {
 
     @Override
     public boolean add(Integer item) {
-        return get(toIndex(item)).add(toValue(item));
+        return get(item).add(toValue(item));
     }
 
     @Override
     public boolean remove(Object item) {
         if (!fixedBitMapSetMap.containsKey(toIndex(item)))
             return false;
-        return get(item).remove(item);
+        return get(item).remove(toValue((Integer)item));
     }
 
     @Override
@@ -135,7 +135,8 @@ public class BitMapSet implements Set<Integer> {
     }
 
     private int toValue(int value) {
-        return value % maxBitSize;
+        final int v = value % (maxBitSize);
+        return v==0 ? maxBitSize : v;
     }
 
     @Override
@@ -143,6 +144,12 @@ public class BitMapSet implements Set<Integer> {
         fixedBitMapSetMap.clear();
     }
 
+    protected void printDebug() {
+        for(Map.Entry<Integer,FixedBitMapSet> e : fixedBitMapSetMap.entrySet()) {
+            System.out.println(">> index: " + e.getKey());
+            e.getValue().printDebug();
+        }
+    }
 
     private class itr implements Iterator<Integer> {
         final Iterator<Map.Entry<Integer, FixedBitMapSet>> mainIterator = fixedBitMapSetMap.entrySet().iterator();
@@ -157,8 +164,7 @@ public class BitMapSet implements Set<Integer> {
 
         @Override
         public Integer next() {
-            final Integer r = current;
-//            current = currentIndex * maxBitSize + current;
+            final Integer r = currentIndex * maxBitSize + current;
             updateCurrentValue();
             return r;
         }

@@ -28,6 +28,10 @@ public class FixedBitMapSetTest {
         set.add(23);
     }
 
+    public void bitTest() {
+        set.printDebug();
+    }
+
     @Test
     public void countTest() {
         assertThat(2, is(set.size()));

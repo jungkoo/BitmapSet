@@ -179,8 +179,9 @@ public class FixedBitMapSet implements Set<Integer> {
         if (bit_value != bitmap[arr_idx]) {
         	bitmap[arr_idx] = bit_value;
             count-=1;
+			return true;
         }
-        return true;
+        return false;
 	}
 
 	@Override
@@ -300,4 +301,12 @@ public class FixedBitMapSet implements Set<Integer> {
         count = limitValue;
         bitmap = null;
     }
+
+	protected void printDebug() {
+		unpack();
+		for(long l : bitmap) {
+			System.out.println(Long.toBinaryString(l));
+		}
+		pack();
+	}
 }
