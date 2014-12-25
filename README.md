@@ -115,7 +115,8 @@ BitSet의 단점을 보완하여 많은 아이템을 적은 메모리로 상태�
 	1 2 3 4 5 7 55 56 58 70 100 111 112 113 115 115 114 120 150 156 157 158 159
 
 
-(2) HyperSet이 비효율적인 데이터 : 블럭사이즈가 100이라고 가정한 경우, 숫자마다 블럭하나를 사용해서 메모리 낭비가 크다
+(2) HyperSet이 비효율적인 데이터 : 블럭사이즈가 100이라고 가정한 경우, 숫자마다 블럭하나를 사용해서 메모리 낭비가 크다.
+(= 하나의 블럭에 하나의 값만 들어가는 문제를 해결하기 위해 AloneSet라는 단일값용  Set 을 사용한다)
 
 	1 101 201 305 406
 
@@ -123,12 +124,15 @@ BitSet의 단점을 보완하여 많은 아이템을 적은 메모리로 상태�
 아래와 같은 랜덤 숫자를 이용하여 테스트 해 볼수 있다.
 Random 값이 1~10억의 범위의 숫자를 처리한다면, 매우 흡족한 성능을 보이지만, 분포가 훨씬큰 값의 범위 (예: 1~20억단위) 라면 오히여  HashSet 보다 성능이 안좋아진다.
 이는  블럭구조라는 특이성으로 데이터 분포가 데이터 메모리 사용률에 영향을 주는것을 알 수 있다.
+아래 예제는 동일 머신환경에서 돌렸을때의 결과이므로 참고하자.
 
 
-    final Set<Integer> set = new HyperSet();  // 블럭의 숫자크기를 지정할 수 있다.
+예제1) 1~20억 사이의 랜덤값을 HashSet을 이용한 경우 (207만개이 아이템 이용 가능하다)
 
-    final int limit = 1000000000;//Integer.MAX_VALUE;
-    final Random r = new Random();
+    [code]
+    final Set<Integer> set = new HashSet();
+    final int limit = 2000000000; // 20억
+    Random r = new Random();
     for(int i=1; i<=10000000; i++) {
         int n = Math.abs(r.nextInt(limit)+1);
         set.add(n);
@@ -136,3 +140,117 @@ Random 값이 1~10억의 범위의 숫자를 처리한다면, 매우 흡족한 �
             System.out.println("i="+i +", n=" + n + ", size="+set.size());
         }
     }
+    System.out.println(set.size());
+    
+    
+    [result]
+    i=10000, n=1864790387, size=10000
+    i=20000, n=267272861, size=20000
+    ... 생략 ...
+    i=2060000, n=1072402759, size=2058905
+    i=2070000, n=1292911596, size=2068899
+    Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+    	at java.util.HashMap.addEntry(HashMap.java:753)
+    	at java.util.HashMap.put(HashMap.java:385)
+    	at java.util.HashSet.add(HashSet.java:200)
+    	at net.indf.collection.TestMain.main(TestMain.java:26)
+    	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+    	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+    	at java.lang.reflect.Method.invoke(Method.java:597)
+    	at com.intellij.rt.execution.application.AppMain.main(AppMain.java:134)
+
+
+
+예제2) 1~20억 사이의 랜덤값을 HyperSet 으로 이용한 경우 (5만건 정도)
+
+    [code]
+    final Set<Integer> set = new HyperSet();
+    final int limit = 2000000000; // 20억
+    Random r = new Random();
+    for(int i=1; i<=10000000; i++) {
+        int n = Math.abs(r.nextInt(limit)+1);
+        set.add(n);
+        if (i%10000==0) {
+            System.out.println("i="+i +", n=" + n + ", size="+set.size());
+        }
+    }
+    System.out.println(set.size());
+    
+    
+    [result]
+     i=10000, n=356295280, size=10000
+     i=20000, n=1260534668, size=20000
+     i=30000, n=1487645544, size=30000
+     i=40000, n=1679554431, size=40000
+     i=50000, n=934191284, size=49999
+     Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+        at net.indf.collection.FixedBitSet.clear(FixedBitSet.java:276)
+        at net.indf.collection.FixedBitSet.<init>(FixedBitSet.java:35)
+        at net.indf.collection.HyperSet.add(HyperSet.java:80)
+        at net.indf.collection.HyperSet.add(HyperSet.java:10)
+        at net.indf.collection.TestMain.main(TestMain.java:26)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+        at java.lang.reflect.Method.invoke(Method.java:597)
+        at com.intellij.rt.execution.application.AppMain.main(AppMain.java:134)
+
+예제3) 1~20억 사이의 랜덤값을 HyperSet 으로 이용한 경우 (단, 블럭의 크기를 2048로 변경한 경우)
+
+    [code]
+    final Set<Integer> set = new HyperSet(2048);//==> 숫자 인접도가 떨어진다면 블럭크기를 작게 잡으면 유용하다.
+    final int limit = 2000000000; // 20억
+    Random r = new Random();
+    for(int i=1; i<=10000000; i++) {
+        int n = Math.abs(r.nextInt(limit)+1);
+        set.add(n);
+        if (i%10000==0) {
+            System.out.println("i="+i +", n=" + n + ", size="+set.size());
+        }
+    }
+    System.out.println(set.size());
+    
+    [result]
+    i=10000, n=851757464, size=10000
+    i=20000, n=1332679172, size=20000
+        ...  생략 ...
+    i=940000, n=488216681, size=939800
+    i=950000, n=1544252811, size=949794
+    i=960000, n=1935780660, size=959787
+    Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+        at net.indf.collection.FixedBitSet.clear(FixedBitSet.java:276)
+        at net.indf.collection.FixedBitSet.<init>(FixedBitSet.java:35)
+        at net.indf.collection.HyperSet.add(HyperSet.java:80)
+        at net.indf.collection.HyperSet.add(HyperSet.java:10)
+        at net.indf.collection.TestMain.main(TestMain.java:26)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+        at java.lang.reflect.Method.invoke(Method.java:597)
+        at com.intellij.rt.execution.application.AppMain.main(AppMain.java:134)
+    
+    
+예제4) 1~10억 사이의 랜덤값을 HyperSet 으로 이용한 경우라면  HashSet보다 훨씬 효율적이다.
+
+    [code]
+    final Set<Integer> set = new HyperSet(2048);//==> 숫자 인접도가 떨어진다면 블럭크기를 작게 잡으면 유용하다.
+    final int limit = 1000000000; // 10억
+    Random r = new Random();
+    for(int i=1; i<=10000000; i++) {
+        int n = Math.abs(r.nextInt(limit)+1);
+        set.add(n);
+        if (i%10000==0) {
+            System.out.println("i="+i +", n=" + n + ", size="+set.size());
+        }
+    }
+    System.out.println(set.size());
+    
+    [result]
+    i=10000, n=707133770, size=10000
+    i=20000, n=667099207, size=20000
+    ...생략...
+    i=9980000, n=802200508, size=9930404
+    i=9990000, n=465487717, size=9940303
+    i=10000000, n=651885667, size=9950197
+    9950197
